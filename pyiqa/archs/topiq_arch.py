@@ -22,6 +22,9 @@ from pyiqa.archs.arch_util import dist_to_mos, load_pretrained_network, random_c
 import copy
 from .clip_model import load
 from .topiq_swin import create_swin
+from typing import Optional
+from torch import Tensor
+
 
 
 default_model_urls = {
@@ -72,7 +75,7 @@ class TransformerEncoderLayer(nn.Module):
     def forward(self, src):
         src2 = self.norm1(src)
         q = k = src2
-        src2, self.attn_map = self.self_attn(q, k, value=src2)
+        src2 = self.self_attn(q, k, src2)[0]
         src = src + self.dropout1(src2)
         src2 = self.norm2(src)
         src2 = self.linear2(self.dropout(self.activation(self.linear1(src2))))
@@ -104,8 +107,8 @@ class TransformerDecoderLayer(nn.Module):
     def forward(self, tgt, memory):
         memory = self.norm2(memory)
         tgt2 = self.norm1(tgt)
-        tgt2, self.attn_map = self.multihead_attn(query=tgt2,
-                                                  key=memory, value=memory)
+        tgt2 = self.multihead_attn(query=tgt2,
+                                                  key=memory, value=memory)[0]
         tgt = tgt + self.dropout2(tgt2)
         tgt2 = self.norm3(tgt)
         tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt2))))
@@ -434,7 +437,7 @@ class CFANet(nn.Module):
 
         return out_score
     
-    def forward(self, x, y=None, return_mos=True, return_dist=False):
+    def forward(self, x, y: Optional[Tensor] = None, return_mos=True, return_dist=False):
         if self.use_ref:
             assert y is not None, f'Please input y when use reference is True.'
         else:

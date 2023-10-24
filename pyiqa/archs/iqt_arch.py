@@ -23,7 +23,7 @@ from einops import repeat
 import timm
 
 from pyiqa.utils.registry import ARCH_REGISTRY
-from pyiqa.archs.arch_util import load_pretrained_network, to_2tuple
+from pyiqa.archs.arch_util import load_pretrained_network, to_ntuple
 
 
 class IQARegression(nn.Module):
@@ -343,7 +343,7 @@ def get_attn_decoder_mask(seq):
 
 def random_crop(x, y, crop_size, crop_num):
     b, c, h, w = x.shape
-    ch, cw = to_2tuple(crop_size)
+    ch, cw = to_ntuple(2, crop_size)
 
     crops_x = []
     crops_y = []

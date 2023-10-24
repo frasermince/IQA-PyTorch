@@ -14,7 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import nn, einsum
 
-from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from timm.models.layers import DropPath, to_ntuple, trunc_normal_
 
 from einops import rearrange
 from functools import partial
@@ -391,7 +391,7 @@ class PatchEmbed(nn.Module):
     """ Image to Patch Embedding """
     def __init__(self, patch_size=16, in_chans=3, embed_dim=768):
         super().__init__()
-        patch_size = to_2tuple(patch_size)
+        patch_size = to_ntuple(2, patch_size)
 
         self.patch_size = patch_size
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)

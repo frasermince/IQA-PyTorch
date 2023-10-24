@@ -59,12 +59,12 @@ class InferenceModel(torch.nn.Module):
         self.device = torch.device(device)
         return self
 
-    def forward(self, target, ref=None, **kwargs):
+    def forward(self, target, ref=None):
 
         with torch.set_grad_enabled(self.as_loss):
 
             if 'fid' in self.metric_name:
-                output = self.net(target, ref, device=self.device, **kwargs)
+                output = self.net(target, ref, device=self.device)
             else:
                 if not torch.is_tensor(target):
                     target = imread2tensor(target, rgb=True)
@@ -75,9 +75,9 @@ class InferenceModel(torch.nn.Module):
                         ref = ref.unsqueeze(0)
 
                 if self.metric_mode == 'FR':
-                    output = self.net(target.to(self.device), ref.to(self.device), **kwargs)
+                    output = self.net(target.to(self.device), ref.to(self.device))
                 elif self.metric_mode == 'NR':
-                    output = self.net(target.to(self.device), **kwargs)
+                    output = self.net(target.to(self.device))
 
         if self.as_loss:
             if isinstance(output, tuple):

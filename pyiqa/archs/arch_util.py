@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import collections.abc
+from collections.abc import Sequence
 from itertools import repeat
 import numpy as np
 
@@ -12,6 +13,8 @@ import torchvision.transforms as T
 
 from .constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
 from pyiqa.utils.download_util import load_file_from_url
+
+
 
 
 # --------------------------------------------
@@ -34,7 +37,7 @@ def dist_to_mos(dist_score: torch.Tensor) -> torch.Tensor:
     mos_score = mos_score.sum(dim=-1, keepdim=True)
     return mos_score
 
-def random_crop(input_list, crop_size, crop_num):
+def random_crop(tensor_input, crop_size: int, crop_num: int):
     """
     Randomly crops the input tensor(s) to the specified size and number of crops.
 
@@ -48,11 +51,14 @@ def random_crop(input_list, crop_size, crop_num):
         tensor or list of tensors: If a single input tensor is provided, a tensor of cropped images is returned.
             If a list of input tensors is provided, a list of tensors of cropped images is returned.
     """
-    if not isinstance(input_list, collections.abc.Sequence):
-        input_list = [input_list]
+    if not isinstance(tensor_input, (list)):
+        input_list = [tensor_input]
+    else:
+        input_list = tensor_input
 
     b, c, h, w = input_list[0].shape
-    ch, cw = to_2tuple(crop_size)
+    ch = crop_size
+    cw = crop_size
 
     if min(h, w) <= crop_size:
         scale_factor = (crop_size + 1) / min(h, w)
@@ -122,19 +128,10 @@ def load_pretrained_network(net, model_path, strict=True, weight_keys=None):
     net.load_state_dict(state_dict, strict=strict)
 
 
-def _ntuple(n):
-    def parse(x):
-        if isinstance(x, collections.abc.Iterable):
-            return x
-        return tuple(repeat(x, n))
-
-    return parse
+def _ntuple(n, x):
+    return tuple(repeat(x, n))
 
 
-to_1tuple = _ntuple(1)
-to_2tuple = _ntuple(2)
-to_3tuple = _ntuple(3)
-to_4tuple = _ntuple(4)
 to_ntuple = _ntuple
 
 

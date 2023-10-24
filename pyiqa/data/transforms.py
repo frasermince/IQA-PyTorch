@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import torchvision.transforms as tf
 import torchvision.transforms.functional as F
-from pyiqa.archs.arch_util import to_2tuple
+from pyiqa.archs.arch_util import to_ntuple
 
 
 def transform_mapping(key, args):
@@ -272,7 +272,7 @@ class PairedAdaptivePadding(torch.nn.Module):
     """Pair version of resize"""
     def __init__(self, target_size, fill=0, padding_mode='constant'):
         super().__init__()
-        self.target_size = to_2tuple(target_size)
+        self.target_size = to_ntuple(2, target_size)
         self.fill = fill
         self.padding_mode = padding_mode
     

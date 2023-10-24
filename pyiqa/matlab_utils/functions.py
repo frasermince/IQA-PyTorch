@@ -2,7 +2,7 @@ import math
 import numpy as np
 import torch
 import torch.nn.functional as F
-from .padding import ExactPadding2d, to_2tuple, symm_pad
+from .padding import ExactPadding2d, to_ntuple, symm_pad
 
 
 def fspecial(size=None, sigma=None, channels=1, filter_type='gaussian'):
@@ -13,7 +13,7 @@ def fspecial(size=None, sigma=None, channels=1, filter_type='gaussian'):
         channels (int): channels of output
     """
     if filter_type == 'gaussian':
-        shape = to_2tuple(size)
+        shape = to_ntuple(2, size)
         m, n = [(ss - 1.) / 2. for ss in shape]
         y, x = np.ogrid[-m:m + 1, -n:n + 1]
         h = np.exp(-(x * x + y * y) / (2. * sigma * sigma))
@@ -210,7 +210,7 @@ def im2col(x, kernel, mode='sliding'):
         flatten patch (Tensor): (b, h * w / kernel **2, kernel * kernel)
     """
     b, c, h, w = x.shape
-    kernel = to_2tuple(kernel)
+    kernel = to_ntuple(2, kernel)
 
     if mode == 'sliding':
         stride = 1
@@ -248,7 +248,7 @@ def blockproc(x, kernel, fun, border_size=None, pad_partial=False, pad_method='z
         results (tensor): concatenated results of each block
     """
     assert len(x.shape) == 4, f'Shape of input has to be (b, c, h, w) but got {x.shape}'
-    kernel = to_2tuple(kernel)
+    kernel = to_ntuple(2, kernel)
     if pad_partial:
         b, c, h, w = x.shape
         stride = kernel
